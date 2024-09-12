@@ -7,8 +7,7 @@ import pandas as pd
 app = FastAPI()
 
 # Load both models
-model_risk_status = joblib.load('xgb_model_risk_status.pkl')
-model_risk_type = joblib.load('xgb_model_risk_type.pkl')
+model_combined = joblib.load('xgb_model_best.pkl') 
 
 class StudentData(BaseModel):
     Attendance: float
