@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
@@ -6,8 +5,7 @@ import pandas as pd
 
 app = FastAPI()
 
-# Load both models
-model_combined = joblib.load('xgb_model_best.pkl') 
+model_combined = joblib.load('xgb_model_best.pkl')
 
 class StudentData(BaseModel):
     Attendance: float
@@ -25,17 +23,18 @@ class StudentData(BaseModel):
 
 @app.post("/predict")
 def predict_risk(data: StudentData):
+
     data_dict = data.dict()
     df = pd.DataFrame([data_dict])
     
-    # Predict risk status
-    risk_status = model_risk_status.predict(df)[0]
-    risk_status_str = "High Risk" if risk_status == 1 else "Low Risk"
+    prediction = model_combined.predict(df)[0]
     
-    # Predict type of risk only if the student is at risk
-    risk_type = "N/A"
-    if risk_status == 1:
-        risk_type = model_risk_type.predict(df)[0]
+    if prediction == 0:
+        risk_status_str = "Low Risk"
+        risk_type = "No Risk"
+    else:
+        risk_status_str = "High Risk"
+        risk_type = ["Academic Risk", "Financial Risk", "Mental Health Risk", "Bullying Risk"][prediction]
     
     return {
         "Risk_Status": risk_status_str,
